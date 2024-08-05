@@ -9,11 +9,15 @@
   },
   "scripts": {
     "dev": "nodemon server.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll --coverage",
+    "test:auth:service": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/services/authService.test.js",
     "test:auth:router": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/routes/authRoutes.test.js",
-    "test:auth:services": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/routes/booksImagesService.test.js"
+    "test:db": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/db/dbconfig.test.js",
+    "test:image:service": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/services/livrosImagensService.test.js",
+    "test:email": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/config/disparoEmail.test.js",
+    "test:aluguel:service": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=src/test/services/aluguelLivroService.test.js"
   },
   "keywords": [],
   "license": "ISC",

@@ -1,56 +1,79 @@
-import { describe } from "@jest/globals";
-import AuthService from "../../services/authService";
-import Usuario from "../../models/usuario";
+import {
+  describe, expect, it,
+} from '@jest/globals';
+import bcryptjs from 'bcryptjs';
+import AuthService from '../../services/authService';
+import Usuario from '../../models/usuario';
 
 const authService = new AuthService();
 
-describe("should be test authService.cadastarUsuario", () => {
-  it("should be verify user need fields name, email and password", async () => {
-    const userMock = {
-      nome: "Rafael",
-      email: "rafael@mail.com",
+describe('Testando a authService.cadastrarUsuario', () => {
+  it('O usuario deve possuir um nome, email e senha', async () => {
+    // arrage
+    const usuarioMock = {
+      nome: 'Raphael',
+      email: 'raphael@teste.com.br',
     };
 
-    const saveUser = authService.cadastrarUsuario(userMock);
-    await expect(saveUser).rejects.toThrowError(
-      "Senha, nome e email dos usuários são obrigatórios"
-    );
+    // act
+    const usuarioSalvo = authService.cadastrarUsuario(usuarioMock);
+
+    // assert
+    await expect(usuarioSalvo).rejects.toThrowError('A senha de usuário é obrigatório!');
   });
 
-  it("should be verify can't register duplicated e-mail", async () => {
-    const userMock = {
-      nome: "Rafael",
-      email: "teste@gmail.com",
-      senha: "332",
+  it('A senha do usuario precisa ser criptografada quando for salva no banco de dados', async () => {
+    const data = {
+      nome: 'John Doe',
+      email: 'johndoe@example.com',
+      senha: 'senha123',
     };
 
-    const saveUser = authService.cadastrarUsuario(userMock);
-    await expect(saveUser).rejects.toThrowError("Usuário já cadastrado");
+    const resultado = await authService.cadastrarUsuario(data);
+    const senhaIguais = await bcryptjs.compare('senha123', resultado.content.senha);
+
+    expect(senhaIguais).toStrictEqual(true);
+
+    await Usuario.excluir(resultado.content.id);
   });
 
-  it("should be verify register message success", async () => {
-    const userMock = {
-      nome: "Rafael",
-      email: "actorws@gmail.com",
-      senha: "332",
+  it('Não pode ser cadastrado um usuario com email duplicado', async () => {
+    const usuarioMock = {
+      nome: 'Raphael',
+      email: 'teste@gmail.com',
+      senha: '123456',
     };
 
-    const saveUser = await authService.cadastrarUsuario(userMock);
-    expect(saveUser.message).toBe("usuario criado");
+    const usuarioSave = authService.cadastrarUsuario(usuarioMock);
 
-    await Usuario.excluir(saveUser.content.id);
+    await expect(usuarioSave).rejects.toThrowError('O email já esta cadastrado!');
   });
 
-  it("should be verify register message success", async () => {
-    const userMock = {
-      nome: "Vitor",
-      email: "asf@gmail.com",
-      senha: "222",
+  it('Ao cadastrar um usuario deve ser retornado uma mensagem informando que o usuario foi cadastrado', async () => {
+    const data = {
+      nome: 'John Doe',
+      email: 'johndoe@example.com',
+      senha: 'senha123',
     };
 
-    const saveUser = await authService.cadastrarUsuario(userMock);
-    expect(saveUser.content).toMatchObject(userMock);
+    const resultado = await authService.cadastrarUsuario(data);
 
-    await Usuario.excluir(saveUser.content.id);
+    expect(resultado.message).toEqual('usuario criado');
+
+    await Usuario.excluir(resultado.content.id);
+  });
+
+  it('Ao cadastrar um usuario validar retorno do usuario', async () => {
+    const data = {
+      nome: 'John Doe',
+      email: 'johndoe@example.com',
+      senha: 'senha123',
+    };
+
+    const resultado = await authService.cadastrarUsuario(data);
+
+    expect(resultado.content).toMatchObject(data);
+
+    await Usuario.excluir(resultado.content.id);
   });
 });

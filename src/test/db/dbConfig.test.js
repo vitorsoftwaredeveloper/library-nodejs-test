@@ -1,22 +1,23 @@
-import { describe } from "@jest/globals";
-import db from "../../db/dbconfig.js";
+import { describe, expect } from '@jest/globals';
+import db from '../../db/dbconfig';
 
-describe("Test config db", () => {
-  it("should be check connection db", async () => {
-    const mockAuthor = {
-      nome: "Luana",
-      nacionalidade: "Brasileira",
+describe('Testando configDB', () => {
+  it('Teste de conexão com o banco de dados', async () => {
+    const autorMock = {
+      nome: 'Luana',
+      nacionalidade: 'Brasileira',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
-    const authorSave = await db("autores")
-      .insert(mockAuthor)
-      .then((res) => db("autores").where("id", res[0]))
-      .then((res) => res[0]);
+    const autorSalvo = await db('autores').insert(autorMock)
+      .then((retorno) => db('autores')
+        .where('id', retorno[0]))
+      .then((autorSelecionado) => autorSelecionado[0]);
 
-    expect(authorSave.nome).toBe(mockAuthor.nome);
+    expect(autorSalvo.nome).toBe(autorMock.nome);
 
-    await db("autores").where({ id: authorSave.id }).del();
+    await db('autores').where({ id: autorSalvo.id }).del();
   });
+
 });
